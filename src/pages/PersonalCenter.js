@@ -11,24 +11,23 @@ import { useUserContext } from '../context/UserContext';
 import config from '../config';
 
 function PersonalCenter(){
-  
   return (
     <div>
       <RequireLogin
-      logined={PersonalCenterUI}
+      logined={<PersonalCenterUI/>}
       notlogin={
         <p>还未登陆，请先登陆</p>
       }
       />
     </div>
   )
-
 }
 
 export default PersonalCenter;
 
 function PersonalCenterUI(){
   const { user,dispatch } = useUserContext();
+  console.log('dadd')
   return(
   <Card>
     <p>{user.name}</p>
@@ -54,7 +53,7 @@ function PersonalCenterUI(){
           </Row>
         </Container>
       </Tab>
-      <Tab className="my-3 mx-3" eventKey="contact" title="设置">
+      <Tab className="my-3 mx-3" eventKey="setting" title="设置">
         <Container>
           <ListGroup>
             <ListGroup.Item>

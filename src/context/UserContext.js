@@ -37,7 +37,6 @@ class UserManager {
         this.info.name=user_result.name
         this.info.avatar_url=user_result.avatar_url
       }else{
-        console.log('lllll')
         this.login_state.login_message=validate_result.message
       }
     } catch (error) {
@@ -113,7 +112,7 @@ const useUserContext = () => {
   };
 
   return {
-    user, // 修改属性名为 userInfo
+    user, 
     dispatch
   };
 };

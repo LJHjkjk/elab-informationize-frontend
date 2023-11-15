@@ -12,15 +12,13 @@ function RequireLogin({logined,notlogin}){
     const [isLoggedIn, setIsLoggedIn] = useState(user.login_state.is_logined);
   
     // 当用户信息发生变化时更新状态
-    useEffect(() => {
-      setIsLoggedIn(user.login_state.is_logined);
-    }, [user.login_state.is_logined]);
-
-
+    // useEffect(() => {
+    //   setIsLoggedIn(user.login_state.is_logined);
+    // }, [user.login_state.is_logined]);
 
     return (
         <div className="require-login">
-            {isLoggedIn?logined:notlogin}
+            {isLoggedIn?notlogin:logined}
         </div>
     )
 }

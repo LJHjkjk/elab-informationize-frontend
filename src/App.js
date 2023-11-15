@@ -9,6 +9,9 @@ import Sidebar from './components/Base/Sidebar'
 import './app.css'
 
 import PersonalCenter from './pages/PersonalCenter'
+import MailCenter from './pages/MailCenter'
+import Test from './pages/test'
+
 import { UserProvider, useUserContext } from './context/UserContext'
 import Alert from 'react-bootstrap/Alert';
 
@@ -23,15 +26,14 @@ function App() {
           <Navbar/>
         </Row>
         <Row className='my-4'>
-          <Col className='col-3'>
+          <Col className='col-2 mx-3'>
             <Sidebar/>
           </Col>
-          <Col className='col-1'></Col>
-          <Col className='col-7'>
+          <Col className='col-9 mx-5'>
             <Routes>
-              <Route path='/office-hall' element={<p>办事大厅 </p>} />
+              <Route path='/office-hall' element={<Test/>} />
               <Route path='/to-do-list' element={<p>待办事项 </p>} />
-              <Route path='/mail' element={<p>邮件 </p>} />
+              <Route path='/mail/*' element={<MailCenter/>} />
               <Route path='/personal-center' element={<PersonalCenter/>} />
               <Route path='/about' element={<p>关于</p>} />
             </Routes>

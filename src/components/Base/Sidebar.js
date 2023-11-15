@@ -2,6 +2,7 @@
 import Card from 'react-bootstrap/Card';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from "react-router-dom";
+import NavDropdown from 'react-bootstrap/NavDropdown';
 
 function Sidebar() {
   return (

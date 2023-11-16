@@ -24,6 +24,7 @@ function App() {
         <Row>
           <LoginAlert/>
           <Navbar/>
+          <p></p>
         </Row>
         <Row className='my-4'>
           <Col className='col-2 mx-3'>

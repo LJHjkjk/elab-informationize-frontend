@@ -29,7 +29,9 @@ function App() {
           <Col className='col-2 mx-3'>
             <Sidebar/>
           </Col>
-          <Col className='col-9 mx-5'>
+          <Col className='col-1'>
+          </Col>
+          <Col className='col-8 mx-5'>
             <Routes>
               <Route path='/office-hall' element={<Test/>} />
               <Route path='/to-do-list' element={<p>待办事项 </p>} />

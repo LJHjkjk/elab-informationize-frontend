@@ -13,7 +13,7 @@ function NavbarElab() {
 
 
   return (
-  <Navbar className="bg-body-tertiary " >
+  <Navbar className="bg-secondary">
     <Container  >
       <Navbar.Brand href="/page" >
         <img

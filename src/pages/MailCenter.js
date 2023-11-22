@@ -81,7 +81,7 @@ function MailDetails(){
 		
 	)
 }
-
+//收件箱
 function Mailbox(){
 	//获取页数
 	const {page,setPage}=useState(1)

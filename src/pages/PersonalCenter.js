@@ -53,7 +53,7 @@ function PersonalCenterUI(){
           </Row>
         </Container>
       </Tab>
-      <Tab className="my-3 mx-3" eventKey="setting" title="设置">
+      <Tab className="my-3 mx-3" eventKey="settings" title="设置">
         <Container>
           <ListGroup>
             <ListGroup.Item>

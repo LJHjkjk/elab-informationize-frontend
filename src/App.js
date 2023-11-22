@@ -11,6 +11,8 @@ import './app.css'
 import PersonalCenter from './pages/PersonalCenter'
 import MailCenter from './pages/MailCenter'
 import Test from './pages/test'
+import ToDoList from './pages/ToDoList'
+
 
 import { UserProvider, useUserContext } from './context/UserContext'
 import Alert from 'react-bootstrap/Alert';
@@ -30,12 +32,10 @@ function App() {
           <Col className='col-2 mx-3'>
             <Sidebar/>
           </Col>
-          <Col className='col-1'>
-          </Col>
           <Col className='col-8 mx-5'>
             <Routes>
               <Route path='/office-hall' element={<Test/>} />
-              <Route path='/to-do-list' element={<p>待办事项 </p>} />
+              <Route path='/to-do-list' element={<ToDoList/>} />
               <Route path='/mail/*' element={<MailCenter/>} />
               <Route path='/personal-center' element={<PersonalCenter/>} />
               <Route path='/about' element={<p>关于</p>} />

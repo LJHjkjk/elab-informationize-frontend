@@ -10,6 +10,7 @@
     "buffer": "^6.0.3",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.4.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",

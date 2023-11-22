@@ -14,7 +14,7 @@ function Sidebar() {
             <Nav.Link as={Link} to="/office-hall">办事大厅</Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link as={Link}  to="/to-do-list">代办事项</Nav.Link>
+            <Nav.Link as={Link}  to="/to-do-list">待办事项</Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link as={Link} to="/mail">邮件</Nav.Link>

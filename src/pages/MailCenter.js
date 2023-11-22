@@ -19,7 +19,7 @@ function MailCenter(){
 	return (
 		<div>
 			<RequireLogin
-			logined={<MailCenterRouter/>}
+			logined={<MailCenterData/>}
 			notlogin={
 				<p>还未登陆，请先登陆</p>
 			}
@@ -32,10 +32,10 @@ export default MailCenter
 
 
 //邮件中心路由设置
-function MailCenterRouter(){
+function MailCenterData(){
 	return (    
 		<Card>
-			<Routes basePath='mail'>
+			<Routes basePath='mail' >
 				<Route path='/' element={<MailCenterTabs/>}/>
 				<Route path='/mail-details/:id' element={<MailDetails/>}/>
 			</Routes>

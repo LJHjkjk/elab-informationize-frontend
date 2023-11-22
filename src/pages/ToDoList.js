@@ -15,7 +15,7 @@ function ToDoList(){
     return (
 		<div>
 			<RequireLogin
-			logined={<ToDoListUI/>}
+			logined={<ToDoListData/>}
 			notlogin={
 				<p>还未登陆，请先登陆</p>
 			}
@@ -24,100 +24,111 @@ function ToDoList(){
 	)
 }
 
-function ToDoListUI(){
+
+function ToDoListData(){
+    //获取数据
+    //处理数据
+    //向下传递
+    var group1={
+        title:"nijao1",
+        items:[{
+            "name":'llkkkj',
+            "datetime":123,
+            "path":12,
+            "title":"dadw"
+        },{
+            "name":'llkkkj',
+            "datetime":123,
+            "path":12,
+            "title":"dadw"
+        },{
+            "name":'llkkkj',
+            "datetime":123,
+            "path":12,
+            "title":"dadw"
+        },]
+    } 
+    var group2={
+        title:"nij",
+        items:[{
+            "name":'llkkkj',
+            "datetime":123,
+            "path":12,
+            "title":"dadw"
+        },{
+            "name":'llkkkj',
+            "datetime":123,
+            "path":12,
+            "title":"dadw"
+        },{
+            "name":'llkkkj',
+            "datetime":123,
+            "path":12,
+            "title":"dadw"
+        },]
+    }     
+    var groups=[group1,group2]
+
+
     return (
-        <Accordion>
-            <Accordion.Item eventKey="0">
-                <Accordion.Header>Accordion Item</Accordion.Header>
-                <Accordion.Body>
-                    <ListGroup>
-                        <ToDoListItem name='lllllllll' title='dddddddddd' id={100}/>
-                        <ListGroup.Item  action>
-                            <Table borderless>
-                                <tbody>
-                                    <tr>
-                                    <td>1</td>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </ListGroup.Item>
-                        <ListGroup.Item action>
-                        <Table borderless>
-                                <tbody>
-                                    <tr>
-                                    <td>1</td>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </ListGroup.Item>
-                        <ListGroup.Item action>
-                        <Table borderless> 
-                                <tbody>
-                                    <tr>
-                                    <td>1</td>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </ListGroup.Item>
-                        <ListGroup.Item action>
-                        <Table borderless>
-                                <tbody>
-                                    <tr>
-                                    <td>1</td>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </ListGroup.Item>
-                    </ListGroup>
-                </Accordion.Body>
-            </Accordion.Item>
-            <Accordion.Item eventKey="1">
-                <Accordion.Header>Accordion Item</Accordion.Header>
-                <Accordion.Body>
-                    <Table borderless>
-                        <tbody>
-                            <tr>
-                                <Link to='/'>
-                                <th>dddd</th>
-                                <th>dddd</th>
-                                <th>dddd</th>
-                                </Link>
-                            </tr>
-                            <tr>
-                                <th>dddd</th>
-                                <th>dddd</th>
-                                <th>dddd</th>
-                            </tr>
-                            <tr>
-                                <th>dddd</th>
-                                <th>dddd</th>
-                                <th>dddd</th>
-                            </tr>
-                        </tbody>
-                    </Table>
-                </Accordion.Body>
-            </Accordion.Item>
-        </Accordion>
+        <Card>
+            <Routes basePath='/to-do-list'>
+                <Route path='/' element={<ToDoListUI groups={groups}/>}/>
+                <Route path='/details/<:id>' element={<ToDoListDetails/>}/>
+            </Routes>
+        </Card>
     )
 }
 
 
-function ToDoListItem({id,datetime,name,title}){
-    const target_url='/to-do-list/'+String(id)
+function ToDoListDetails(){
+    //请求数据
+
+    return
+
+}
+
+function ToDoListUI({groups}){
+    return (
+        <Container>
+            <Row>
+                <Accordion className='my-3'>
+                    {groups.map((group, index) => (
+                    <ToDoListGroup key={index} groupName={group.title} group={group} />
+                    ))}
+                </Accordion>
+            </Row>
+        </Container>
+    )
+}
+
+
+function ToDoListGroup({groupName,group}){
+    return(
+        <Accordion.Item eventKey={groupName}>
+            <Accordion.Header>{group.title}</Accordion.Header>
+            <Accordion.Body>
+                {group.items.map(item=>
+                    <ToDoListItem 
+                    datetime={item.datetime}
+                    name={item.name}
+                    title={item.title}
+                    path={item.path}
+                    />
+                )}
+            </Accordion.Body>
+        </Accordion.Item>
+    )
+}
+
+function ToDoListItem({path,datetime,name,title}){
+    const target_url='/to-do-list/details/de'+String(path)
     const customFormat = DateTime.fromMillis(datetime).toFormat('yyyy-MM-dd HH:mm');
 
     return (
         <Link to={target_url} style={{ textDecoration: 'none' }}>
-            <ListGroup.Item  > 
-                <Table borderless>
+            <ListGroup.Item action > 
+                <Table borderless >
                     <tbody>
                         <tr>
                             <td>{customFormat}</td>

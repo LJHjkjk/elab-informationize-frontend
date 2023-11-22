@@ -17,6 +17,7 @@ function PersonalCenter(){
       logined={<PersonalCenterUI/>}
       notlogin={
         <p>还未登陆，请先登陆</p>
+        
       }
       />
     </div>
@@ -37,6 +38,11 @@ function PersonalCenterUI(){
     >
       <Tab className="my-3 mx-3"  eventKey="profile" title="个人资料">
         <Container>
+        <span class="material-symbols-outlined">
+add_circle
+</span><span class="material-symbols-outlined">
+star
+</span>
           <Row>
             <Col className='col-2 my-3 mx-3'>
               <Avatar url={user.info.avatar_url}/>

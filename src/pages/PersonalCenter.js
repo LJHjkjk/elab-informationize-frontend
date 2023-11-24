@@ -27,35 +27,28 @@ function PersonalCenter(){
 export default PersonalCenter;
 
 function PersonalCenterUI(){
-  const { user,dispatch } = useUserContext();
-  console.log('dadd')
+  const [userManager,state] = useUserContext();
   return(
   <Card>
-    <p>{user.name}</p>
     <Tabs
       defaultActiveKey="profile"
       className="my-3 mx-3"
     >
       <Tab className="my-3 mx-3"  eventKey="profile" title="个人资料">
         <Container>
-        <span class="material-symbols-outlined">
-add_circle
-</span><span class="material-symbols-outlined">
-star
-</span>
           <Row>
             <Col className='col-2 my-3 mx-3'>
-              <Avatar url={user.info.avatar_url}/>
+              <Avatar src={state.avatar}/>
             </Col>
             <Col>
-              <Row><h2>{user.name}</h2></Row>
-              <Row><p>id:{user.id}</p></Row>
+              <Row><h2>{state.name}</h2></Row>
+              <Row><p>id:{state.id}</p></Row>
             </Col>
           </Row>
             
           <Row>
-            <p>所在组织：{user.group_name}</p>
-            <p>担任职务：{user.job}</p>
+            <p>所在组织：{state.group_name}</p>
+            <p>担任职务：{state.job}</p>
           </Row>
         </Container>
       </Tab>

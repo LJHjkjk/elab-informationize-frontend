@@ -5,7 +5,7 @@ var auth_api={
   
 
 var user_api={
-  'get_user_info':'/api/user/${user_id}'
+  'get_user_info':'/api/user'
 }
 
 export {user_api,auth_api}

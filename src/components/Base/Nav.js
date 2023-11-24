@@ -9,7 +9,7 @@ import { Avatar } from '../Image';
 import config from '../../config';
 
 function NavbarElab() {
-  const {user,dispatch}=useUserContext();
+  const [userManager,state]=useUserContext();
 
 
   return (
@@ -29,8 +29,8 @@ function NavbarElab() {
         <RequireLogin
         logined={
           <div>
-            <Avatar url=''/>
-            <p>{user.info.name}</p>
+            <Avatar src={state.avatar}/>
+            <p>{state.name}</p>
           </div>
         }
         notlogin={

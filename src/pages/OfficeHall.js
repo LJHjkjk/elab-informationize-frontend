@@ -17,6 +17,8 @@ import reimbursement_apply_icon from './icons/reimbursement_apply.svg'
 import research_assistant_apply_icon from './icons/research_assistant_apply_icon.svg'
 
 import ResearchAssistantApply from '../components/Service/ResearchAssistantApply'
+import ReimbursementApply from '../components/Service/ResearchAssistantApply'
+
 
 function OfficeHall(){
     return(
@@ -32,6 +34,7 @@ function OfficeHallRoute(){
         <Routes basePath='/office-hall'>
             <Route path='/' element={<ServiceItems/>}/>
             <Route path='/research-assistant-apply' element={<ResearchAssistantApply/>}/>
+            <Route path='/reimbursement-apply' element={<ReimbursementApply/>}/>
         </Routes>
     )
 }
@@ -51,7 +54,7 @@ function ServiceItems(){
                         <ServiceItem 
                         icon={reimbursement_apply_icon} 
                         title='报销申请'
-                         url=''/>
+                         url='/office-hall/reimbursement-apply'/>
                         <ServiceItem 
                         icon={research_assistant_apply_icon} 
                         title='科研助手申请'
@@ -81,13 +84,6 @@ function ServiceItem({icon,url,title}){
         </Col>
     )
 }
-
-
-
-
-
-
-
 
 
 export default OfficeHall

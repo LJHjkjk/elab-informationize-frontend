@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import {Routes,Route,Link,useParams} from 'react-router-dom';
 
 import { RequireLogin } from '../components/Login';
+import SelectItems,{UserItem} from '../components/Search';
 import { useUserContext } from '../context/UserContext';
 import config from '../config';
 
@@ -155,27 +156,51 @@ function Mailbox(){
 
 //发送邮件选项卡
 function SendMail(){
-	//选择所有的文件
-	function SelectRecipient(){
-		return(
-			<Modal show={false} >
-				<Modal.Header closeButton>
-					<Modal.Title>Modal heading</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
-				<Modal.Footer>
-				</Modal.Footer>
-			</Modal>
-		)
-	}
+	const [show,setshow]=useState(false)
+	const [receivers,setReceivers]=useState([])
 
+	function finishedSelect(event,selectedItems){
+		setReceivers([...selectedItems])
+		setshow(false)
+	}
+	const users=[
+		{
+			name:'ljh',
+			id:1,
+			avatar:'http://localhost:3000/logo192.png'
+		},		{
+			name:'aiolj',
+			id:2,
+			avatar:'http://localhost:3000/logo192.png'
+		},		{
+			name:'heidwsdiwao',
+			id:3,
+			avatar:'/'
+		},		{
+			name:'jfghushfc',
+			id:14,
+			avatar:'/'
+		},
+	]
 	return(
 		<Container>
-			<Row>
-				<Button>选择收件人</Button>
-				<SelectRecipient/>
+			<SelectItems 
+			items={users} 
+			show={show} 
+			ShowItem={UserItem} 
+			close={()=>setshow(false)}
+			finishedSelect={finishedSelect}
+			preselected={receivers}
+			/>
+			<Row className='my-2'>
+				<Col className='col-3'>
+					<Button  onClick={()=>setshow(true)}>选择收件人</Button>
+				</Col>
+				<Col >
+					{receivers.length==0?'没有选择收件人':'已选择'+ String(receivers.length) +'人'}
+				</Col>
 			</Row>
-			<Row>
+			<Row className='my-2'>
 				<Form>
 					<FloatingLabel
 						controlId="floatingInput"
@@ -186,13 +211,13 @@ function SendMail(){
 					</FloatingLabel>
 					<Form.Group>
 						<Form.Label>正文</Form.Label>
-						<Form.Control as='textarea' rows={15}/>
+						<Form.Control as='textarea' rows={10}/>
 					</Form.Group>
-					<Form.Group>
+					<Form.Group className='my-3'>
 						<Form.Label>添加附件</Form.Label>
 						<Form.Control type='file'></Form.Control>
 					</Form.Group>
-					<Button>提交</Button>
+					<Button className='my-3'>提交</Button>
 				</Form>
 			</Row>
 		</Container>

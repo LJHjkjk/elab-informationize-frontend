@@ -1,14 +1,14 @@
 import Image from 'react-bootstrap/Image'
 import { Link } from 'react-router-dom'
 
-export function Avatar(props){
+export function Avatar({src,size=36}){
   return(
-    <Image src={props.url} width="50" height="50" roundedCircle/>
+    <Image src={src} width={size} height={size} roundedCircle/>
   )
 }
 
-export function Icon({icon}){
+export function Icon({icon,size=50}){
   return (
-    <Image src={icon} width="50" height="50" roundedCircle/>
+    <Image src={icon} width={size} height={size} roundedCircle/>
   )
 }

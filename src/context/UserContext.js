@@ -1,120 +1,107 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useEffect,useState } from 'react';
 import config from '../config/index'
+import { compact } from 'lodash';
+
+class UserInfo{
+  constructor() {
+      this.id=null
+      this.name=null
+      this.avatar= null
+      this.email=null
+      this.phone=null
+      this.award_winning_experience=null
+      this.project_experience=null
+      this.osition=null
+      this.department=null
+
+      this.isLogined=false
+      this.loginMessage='未登录，请登录'
+  }
+}
+
+
 
 
 // 用户管理类
 class UserManager {
-  constructor() {
-    this.info = {
-      id: null,
-      name: null,
-      avatar_url: 'https://www.runoob.com/images/chrome_logo_32.png',
-    };
-    this.login_state = {
-      is_logined: false,
-      login_message: '未登录，请登录',
-    };
+  constructor( state= null,callbackFunction = null) {
+    this.state=state
+    this.callbackFunction=callbackFunction
   }
 
   async init(){
     //验证是否登陆
     try {
-      const validate_response = await fetch(config['API_URL']['AUTH_API']['validate-login'])
+      const validate_response = await fetch(config['API_URL']['AUTH_API']['validate-login'],{
+                  credentials: 'include',
+                  method:'GET'
+                })
       const validate_result = await validate_response.json()
-      console.log(validate_result)
       
       if (validate_result.result=='ok'){
-        this.login_state.is_logined=true
-        this.login_state.login_message='已登陆'
-
         //请求用户信息
-        const user_response=await fetch(
-          config['API_URL']['USER_API']['get_user_info'].replace("${user_id}",validate_result.user_id)
-          )
+        const user_response=await fetch(config['API_URL']['USER_API']['get_user_info']+`?user_id=${validate_result.user_id}`,{
+          credentials: 'include',
+          headers:{id:validate_result.user_id},
+          method:'GET',
+        })
         const user_result=await user_response.json()
-        //修改用户信息
-        this.info.id=user_result.id
-        this.info.name=user_result.name
-        this.info.avatar_url=user_result.avatar_url
+
+        if(user_result.result=='ok'){
+          //设置用户信息
+          this.setUserInfo({
+            id:user_result.message.id,
+            name:user_result.message.name,
+            avatar:user_result.message.avatar,
+            email:user_result.message.email,
+            phone:user_result.message.phone,
+            award_winning_experience:user_result.message.award_winning_experience,
+            project_experience:user_result.message.project_experience,
+            position:user_result.message.position,
+            department:user_result.message.department,
+
+            isLogined: true,
+            loginMessage: '登陆成功',
+          })
+        }
       }else{
-        this.login_state.login_message=validate_result.message
+        this.setUserInfo({login_message:validate_result.message})
       }
     } catch (error) {
-      this.login_state.login_message='网络错误'
+      this.setUserInfo({login_message:error})
     }  
   }
-
-  setUserInfo(newUser) {
-    this.info = newUser;
+  setUserInfo(newState){
+    var newUserInfo={...this.state}
+    for (var i in newState){
+      newUserInfo[i]=newState[i]
+    }
+    this.callbackFunction(newUserInfo)
   }
 }
-
-// 定义操作类型
-const SET_USER = 'SET_USER';
-const LOGOUT = 'LOGOUT';
-
-// Reducer 函数
-const userReducer = (state, action) => {
-  switch (action.type) {
-    case SET_USER:
-      return {
-        ...state,
-        ...action.payload, // 使用整个 action.payload 覆盖 state
-      };
-    case LOGOUT:
-      return {
-        user: {
-          id: null,
-          name: '',
-          isLoggedIn: false,
-        },
-      };
-    default:
-      return state;
-  }
-};
 
 // 创建用户上下文
 const UserContext = createContext();
 
+
 // 创建提供者组件
-const UserProvider = ({ children }) => {
+function UserProvider({ children }){
   // 创建用户管理类的实例
-  const userManager = new UserManager();
-  userManager.init()
-  // 使用 useReducer 来管理用户状态
-  const [state, dispatch] = useReducer(userReducer, userManager);
+  const [state, setUserInfo] = useState(new UserInfo());
+  const userManager = new UserManager(state,setUserInfo);
+  useEffect(()=>{
+    userManager.init()
+  },[])
 
-  // 提供上下文值给组件
-  const contextValue = {
-    user: state,
-    dispatch,
-  };
-
-  return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={[userManager,state]}>{children}</UserContext.Provider>;
 };
 
+
+
 // 创建自定义 hook 以使用用户上下文
-const useUserContext = () => {
-  const { user, dispatch } = useContext(UserContext);
-
-  const setUser = (newUser) => {
-    dispatch({
-      type: SET_USER,
-      payload: newUser,
-    });
-  };
-
-  const logout = () => {
-    dispatch({
-      type: LOGOUT,
-    });
-  };
-
-  return {
-    user, 
-    dispatch
-  };
+function useUserContext(){
+  const [userManger,state] = useContext(UserContext);
+  return [userManger,state]
 };
 
 export { UserProvider, useUserContext };

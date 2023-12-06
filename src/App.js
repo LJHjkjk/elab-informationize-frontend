@@ -1,12 +1,13 @@
 import React,{useState} from 'react';
 import {Routes,Route} from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col,Modal ,Button} from 'react-bootstrap';
 
 
 import Footer from './components/Base/Footer'
 import Navbar from './components/Base/Nav'
 import Sidebar from './components/Base/Sidebar'
 import './app.css'
+
 
 import PersonalCenter from './pages/PersonalCenter'
 import MailCenter from './pages/MailCenter'
@@ -15,9 +16,9 @@ import OfficeHall from './pages/OfficeHall';
 import About from './pages/About';
 
 import { UserProvider, useUserContext } from './context/UserContext'
+import { PopupProvider } from './context/PopupContext';
 import Alert from 'react-bootstrap/Alert';
 import { useEffect } from 'react';
-
 import { Helmet } from 'react-helmet';
 
 
@@ -26,12 +27,14 @@ function App() {
   return (
     <>
       <Helmet>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
       </Helmet>
 
       <div className="App">
+        {/* 上下文 */}
         <UserProvider>
+        <PopupProvider>
+          {/* 内容 */}
           <Container fluid>
             <Row>
               <LoginAlert/>
@@ -45,10 +48,10 @@ function App() {
               <Col className='col-8 mx-5'>
                 <Routes>
                   <Route path='/office-hall/*' element={<OfficeHall/>} />
-                  <Route path='/to-do-list' element={<ToDoList/>} />
+                  <Route path='/to-do-list/*' element={<ToDoList/>} />
                   <Route path='/mail/*' element={<MailCenter/>} />
-                  <Route path='/personal-center' element={<PersonalCenter/>} />
-                  <Route path='/about' element={<About/>} />
+                  <Route path='/personal-center/*' element={<PersonalCenter/>} />
+                  <Route path='/about/*' element={<About/>} />
                 </Routes>
               </Col>
             </Row>
@@ -57,6 +60,7 @@ function App() {
               <Footer />
             </Row>
           </Container>
+        </PopupProvider>
         </UserProvider>
       </div>
     </>

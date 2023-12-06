@@ -13,14 +13,21 @@ class UserInfo{
       this.project_experience=null
       this.osition=null
       this.department=null
+      
+      this.gender=null
+      this.college=null
+      this.major=null
+      this.classname=null
+      this.time_of_enrollment=null
+      this.join_date=null
+      this.native_place=null
+      this.photograph=null
+      this.reason_for_application=null
 
       this.isLogined=false
       this.loginMessage='未登录，请登录'
   }
 }
-
-
-
 
 // 用户管理类
 class UserManager {
@@ -32,7 +39,7 @@ class UserManager {
   async init(){
     //验证是否登陆
     try {
-      const validate_response = await fetch(config['API_URL']['AUTH_API']['validate-login'],{
+      const validate_response = await fetch(config['API']['AUTH_API']['validate-login'],{
                   credentials: 'include',
                   method:'GET'
                 })
@@ -40,7 +47,7 @@ class UserManager {
       
       if (validate_result.result=='ok'){
         //请求用户信息
-        const user_response=await fetch(config['API_URL']['USER_API']['get_user_info']+`?user_id=${validate_result.user_id}`,{
+        const user_response=await fetch(config['API']['USER_API']['get_user_info']+`?user_id=${validate_result.user_id}`,{
           credentials: 'include',
           headers:{id:validate_result.user_id},
           method:'GET',
@@ -59,6 +66,16 @@ class UserManager {
             project_experience:user_result.message.project_experience,
             position:user_result.message.position,
             department:user_result.message.department,
+            
+            gender:user_result.message.gender,
+            college:user_result.message.college,
+            major:user_result.message.major,
+            classname:user_result.message.classname,
+            time_of_enrollment:user_result.message.time_of_enrollment,
+            join_date:user_result.message.join_date,
+            native_place:user_result.message.native_place,
+            photograph:user_result.message.photograph,
+            reason_for_application:user_result.message.reason_for_application,
 
             isLogined: true,
             loginMessage: '登陆成功',
@@ -77,6 +94,10 @@ class UserManager {
       newUserInfo[i]=newState[i]
     }
     this.callbackFunction(newUserInfo)
+  }
+
+  updateUserInfo(){
+    this.init()
   }
 }
 

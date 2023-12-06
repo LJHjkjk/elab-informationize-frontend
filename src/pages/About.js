@@ -1,81 +1,96 @@
 import React, { useState } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import { Container, Row,Figure,Image, Col,Card,Table,FloatingLabel,Button,Badge, Modal, Form, Accordion, ListGroup} from 'react-bootstrap';
+import { useForm, Controller } from 'react-hook-form';
 
-const Calendar = () => {
-  const [events, setEvents] = useState([]);
 
-  const handleAddEvent = () => {
-    const title = window.prompt('New Event name');
-    if (title) {
-      const newEvent = {
-        id: String(events.length + 1),
-        title,
-        start: new Date(), // you can set the start date based on your requirements
-      };
-      setEvents([...events, newEvent]);
+function ImageUpload() {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedImage(file);
+  };
+
+  const handleUpload = () => {
+    // 在这里处理上传逻辑，可以使用 Fetch API 或其他库
+    // 例如，使用 FormData 对象发送文件到服务器
+    const formData = new FormData();
+    formData.append('image', selectedImage);
+
+    // 发送到服务器的示例代码
+    fetch('YOUR_UPLOAD_API_URL', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Upload success:', data);
+        // 处理上传成功的逻辑
+      })
+      .catch(error => {
+        console.error('Upload error:', error);
+        // 处理上传失败的逻辑
+      });
+  };
+
+  return (
+    <div>
+      <input type="file" onChange={handleImageChange} />
+      <button onClick={handleUpload}>上传</button>
+    </div>
+  );
+}
+
+
+
+const FileUploadForm = () => {
+  const { handleSubmit, control } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', data.file);
+
+      const response = await fetch('YOUR_UPLOAD_API_URL', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      // 处理上传结果
+      console.log(result);
+    } catch (error) {
+      console.error('上传失败:', error);
     }
   };
 
   return (
-    <div>
-      <FullCalendar
-        plugins={[dayGridPlugin]}
-        initialView="dayGridMonth"
-        events={events}
-      />
-      <button onClick={handleAddEvent}>Add Event</button>
-    </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div>
+        <label>选择文件：</label>
+        <Controller
+          name="file"
+          control={control}
+          render={({ field }) => (
+            <input
+              type="file"
+              onChange={(e) => {
+                field.onChange(e.target.files[0]);
+              }}
+            />
+          )}
+        />
+      </div>
+
+      <button type="submit">提交</button>
+    </form>
   );
 };
-
-
-const SearchBox = ({ onSearch }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearchChange = (event) => {
-    const newSearchTerm = event.target.value;
-    setSearchTerm(newSearchTerm);
-    onSearch(newSearchTerm);
-  };
-
-  return (
-    <input
-      type="text"
-      placeholder="Search..."
-      value={searchTerm}
-      onChange={handleSearchChange}
-    />
-  );
-};
-
-const MyComponent = () => {
-  const [data, setData] = useState(['ll','ddd','aa']);
-  const [filteredData, setFilteredData] = useState(data);
-
-  const handleSearch = (searchTerm) => {
-    const filteredResults = data.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filteredResults);
-  };
-
-  return (
-    <div>
-      <SearchBox onSearch={handleSearch} />
-      {/* Render your data using filteredData */}
-    </div>
-  );
-};
-
-
 function About(){
     return(
       <>
-      <Calendar/>
-      <MyComponent/>
-      <Image src="https://img2.baidu.com/it/u=496494351,3684413482&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500" thumbnail />
+        <FileUploadForm/>
       </>
     )
 }

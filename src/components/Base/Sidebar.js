@@ -1,8 +1,8 @@
-
 import Card from 'react-bootstrap/Card';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from "react-router-dom";
-import NavDropdown from 'react-bootstrap/NavDropdown';
+
+import {VerticalPlaceholder} from '../Placeholder'
 
 function Sidebar() {
   return (
@@ -28,7 +28,9 @@ function Sidebar() {
         </Nav>
       </Card.Header>
       <Card.Body>
-        dwa
+        公告：<br/>
+        <VerticalPlaceholder height={0.5}/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这里添加公告
       </Card.Body>
     </Card>
     </div>

@@ -1,19 +1,20 @@
 import { Container, Row,Figure,Image, Col,Card,Table,FloatingLabel,Button,Badge, Modal, Form, Accordion, ListGroup} from 'react-bootstrap';
 import { useState } from 'react';
 import Fuse from 'fuse.js';
-import { setAllDocuments } from 'react-doc-viewer/build/state/actions';
 import isEqual from 'lodash/isEqual';
 import { Avatar } from './Image';
 
+import { VerticalPlaceholder } from './Placeholder';
 class UserItem{
   static Show({item}){
     return(
-      <Container>
-        <Row>
-          <Col><Avatar url={item.avatar} size={36} /></Col>
-          <Col>{item.name}</Col>
-        </Row>
-      </Container>
+      <Row>
+        <Col className='col-2'><Avatar src={item.avatar} size={36} /></Col>
+        <Col >
+        <Row><VerticalPlaceholder height={0.4}/></Row>
+        {item.name}
+        </Col>
+      </Row>
     )
   }
   static SearchKey(){
@@ -28,14 +29,19 @@ function Item({item,ShowItem,addSelected,isSelect}){
   }
   return(
       <Row className='d-flex align-items-center justify-content-center'>
-        <Col>
+        <Col className='col-1'>
           <Form.Check
             type="checkbox"
-            label={<ShowItem item={item}/>}
+            // label={<ShowItem item={item}/>}
             checked={isSelect}
             onChange={addSelectClosure}
+            className='my-3'
           />
         </Col>
+        <Col>
+          <ShowItem item={item}/>
+        </Col>
+
       </Row>
   )
 }
@@ -48,10 +54,6 @@ function SearchBox({ModifyOnSearch}){
       </Row>
     </Container>
   )
-}
-
-function DisplayDate({}){
-
 }
 
 
@@ -80,7 +82,6 @@ function SelectItems({show,items,close,finishedSelect,ShowItem,preselected=[]}){
 
     function modifyOnSearch(event){
       setOnSearch(event.target.value)
-      console.log(fuse.search(event.target.value))
     }
 
     function allSelect(event){
@@ -95,7 +96,6 @@ function SelectItems({show,items,close,finishedSelect,ShowItem,preselected=[]}){
 
     function finishedSelectClosure(event){
       finishedSelect(event,selectedItems)
-      console.log(selectedItems)
     }
 
 
@@ -172,4 +172,4 @@ function SelectItems({show,items,close,finishedSelect,ShowItem,preselected=[]}){
 }
 
 export default SelectItems
-export {SearchBox,DisplayDate,UserItem}
+export {SearchBox,UserItem}

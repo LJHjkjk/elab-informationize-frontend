@@ -28,13 +28,13 @@ function NavbarElab() {
       <Nav className="ml-auto">
         <RequireLogin
         logined={
-          <div>
+          <div className='text-center'>
             <Avatar src={state.avatar}/>
             <p>{state.name}</p>
           </div>
         }
         notlogin={
-          <a href={config['API_URL']['AUTH_API']['login']}>登陆</a> 
+          <a href={config['API']['AUTH_API']['login']}>登陆</a> 
         }
         />
       </Nav>

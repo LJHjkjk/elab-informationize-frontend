@@ -30,26 +30,16 @@ function ToDoListData(){
     //处理数据
     //向下传递
     var group1={
-        title:"nijao1",
+        title:"报销申请",
         items:[{
-            "name":'llkkkj',
+            "name":'李佳浩',
             "datetime":123,
             "path":12,
-            "title":"dadw"
-        },{
-            "name":'llkkkj',
-            "datetime":123,
-            "path":12,
-            "title":"dadw"
-        },{
-            "name":'llkkkj',
-            "datetime":123,
-            "path":12,
-            "title":"dadw"
-        },]
+            "title":"报销"
+        }]
     } 
     var group2={
-        title:"nij",
+        title:"科研助手申请",
         items:[{
             "name":'llkkkj',
             "datetime":123,

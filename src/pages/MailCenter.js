@@ -1,44 +1,41 @@
 import { Container, Row, Col,Card,Table,FloatingLabel,Button,Badge, Modal, Form} from 'react-bootstrap';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import React, { useState } from 'react';
-import {Routes,Route,Link,useParams} from 'react-router-dom';
+import React, { useState,useEffect } from 'react';
+import {Routes,Route,Link,useParams,useNavigate} from 'react-router-dom';
+import { DateTime } from 'luxon';
 
 import { RequireLogin } from '../components/Login';
 import SelectItems,{UserItem} from '../components/Search';
-import { useUserContext } from '../context/UserContext';
-import config from '../config';
+import config from '../config/index'
+import SendMailForm from '../form/SendMail'
+import usePopupContext from '../context/PopupContext';
 
-/*
-功能需求：
-1.查看邮件
-2.发送邮件 
-*/
 
-//邮件中心页面
+//邮件中心页面,对外接口
 function MailCenter(){
 	return (
 		<div>
 			<RequireLogin
-			logined={<MailCenterData/>}
+			logined={<MailCenterRoute/>}
 			notlogin={
 				<p>还未登陆，请先登陆</p>
 			}
 			/>
 		</div>
 	)
-  }
+}
 
 export default MailCenter
 
 
 //邮件中心路由设置
-function MailCenterData(){
+function MailCenterRoute(){
 	return (    
 		<Card>
 			<Routes basePath='mail' >
 				<Route path='/' element={<MailCenterTabs/>}/>
-				<Route path='/mail-details/:id' element={<MailDetails/>}/>
+				<Route path='/mail-details/:mail_id' element={<MailDetails/>}/>
 			</Routes>
 		</Card>
   )
@@ -46,7 +43,6 @@ function MailCenterData(){
 
 //邮件中心的选项卡
 function MailCenterTabs({}){
-	//获取邮件信息
 	return (
 		<Tabs
 			defaultActiveKey="home"
@@ -61,7 +57,7 @@ function MailCenterTabs({}){
 			</Tab>
 			<Tab className="my-3 mx-3"  eventKey="mailbox" title="收件箱">
 				<Routes basePath='mail'>
-					<Route path='/' element={<Mailbox page={1}/>}/>
+					<Route path='/' element={<Mailbox/>}/>
 					<Route path='/mailbox' element={<Mailbox/>}/>
 				</Routes>
 			</Tab>
@@ -75,51 +71,121 @@ function MailCenterTabs({}){
 
 //邮件详情页面
 function MailDetails(){
-	const { id } = useParams();
+	const { mail_id } = useParams();
+	const [mailDetails,setMailDetails]=useState('');
+	const popup=usePopupContext()
+
+	//获取信息
+	useEffect(()=>{
+		fetch(config['API']['MAIL_API']['get_mail_details']+`?mail_id=${mail_id}`,{
+			method: 'GET',
+			credentials: 'include',
+		})
+		.then(response => response.json())
+		.then(result => {
+			if (result.result=='ok'){
+				setMailDetails(result.data)
+			}else{
+				popup(result.message,'获取信息失败')
+			}
+		})
+		.catch(error=>{
+			console.error('Error:', error);
+			popup('网络错误','错误','information')
+		})
+	},[])
+
+	function ShowDateTime({datetime}){
+		datetime=DateTime.fromMillis(datetime)
+		return<>{datetime.toFormat('yyyy-MM-dd HH:mm:ss')}</>
+	}
 
 	return (
-		<div><p>pppp</p><p>{id}</p></div>
-		
+		<Card>
+			<Card.Header>
+				<Container>
+					<Row>ID:{mailDetails.mail_id}</Row>
+					<Row className='text-center'><h4>{mailDetails.title}</h4></Row>
+					<Row>
+						<Col>{mailDetails!=''&&<ShowDateTime datetime={mailDetails.pubdate}/>}</Col>
+						<Col className='d-flex justify-content-end'>发件人：{mailDetails.sender_name}</Col>
+					</Row>
+				</Container>
+			</Card.Header>
+			<Card.Body>
+				<br></br>
+				<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{mailDetails.body}</p>
+			</Card.Body>
+		</Card>
 	)
 }
+
+
 //收件箱
 function Mailbox(){
-	//获取页数
-	const {page,setPage}=useState(1)
-		
-	//获取对应页数的数据
+	//总页数
+	const [ pageNumber,setPageNumber]=useState(0)
+	//现在的页数
+	const [nowPage,setNowPage]=useState(0)
+	//收件箱
+	const [mailbox,setMailbox]=useState([])
+
+	const popup=usePopupContext()
+
+	//获取收件箱的数据
+	useEffect(() => {
+		fetch(config['API']['MAIL_API']['get_mailbox'], {
+			method: 'GET',
+			credentials: 'include',
+		  })
+		.then(response => response.json())
+		.then(result => {
+			if (result.result=='ok'){
+				//处理邮件信息
+				setMailbox(result.data)
+				setPageNumber(Math.ceil(result.data.length/config['MAIL']['MAILBOX_SINGLE_PAGE_SIZE']))
+				setNowPage(1)
+			}
+			else{
+				popup(result.message,'获取收件箱失败','information')
+			}
+		})
+		.catch(error => { 
+			console.error('Error:', error);
+			popup('网络错误','错误','information')
+		});
+
+	  }, []); 
 
 
-	//渲染邮件
-
-	function MailItem({sender,theme,overview,date,operation,is_todo=false}){
+	//渲染邮件项组件
+	function MailItem({sender,title,pubdate,operation,is_new=false}){
 		const customMaxWidthStyle = {
-			maxWidth: '150px', // 设置你想要的最大宽度
+			maxWidth: '150px', 
 			overflow: 'hidden',
 			textOverflow: 'ellipsis',
 			whiteSpace: 'nowrap',
 		};
+		const dateTime = DateTime.fromMillis(pubdate);
 		return (
 			<tr>
 				<th >
 					{sender}
 				</th>
 				<th style={customMaxWidthStyle}>
-					{theme}
-				</th>
-				<th style={customMaxWidthStyle}>
-					{overview}
+					{title}
 				</th>
 				<th>
-					{date}
+					{dateTime.toFormat('yyyy-MM-dd HH:mm:ss')}
 				</th>
 				<th>
 					{operation}
-					{!is_todo?<Badge pill bg="secondary">新</Badge>:<></>}
+					{is_new?<Badge pill bg="danger">新</Badge>:<></>}
 				</th>
 			</tr>
 		)
-	}
+	}	
+
 	return(
 		<Container>
 			<Row>
@@ -128,26 +194,33 @@ function Mailbox(){
 						<tr>
 							<th>发件人</th>
 							<th>主题</th>
-							<th>概览</th>
 							<th>时间</th>
 							<th>操作</th>
 						</tr>
 					</thead>
 					<tbody>
+					{mailbox.slice(
+						(nowPage-1)*config['MAIL']['MAILBOX_SINGLE_PAGE_SIZE'], 
+						nowPage==pageNumber?mailbox.length:nowPage*config['MAIL']['MAILBOX_SINGLE_PAGE_SIZE'])
+						.map(
+						(item) => (
 						<MailItem 
-						sender='adadw'
-						theme='dwaaaaaaaaaaaaddddddddddddddddddddddaaaaaa' 
-						overview='dddddddddddddddddddddddddddddddddddddddddd'
-						date='dddddd'
-						operation={<a href='da'>查看</a>}
+						sender={item.sender_name}
+						title={item.title}
+						pubdate={item.pubdate}
+						operation={<Link to={'/mail/mail-details/'+String(item.mail_id)}>查看</Link>}
+						is_new={item.is_new}
 						/>
+						))}
 					</tbody>
 				</Table>
 			</Row>
 			<Row>
-				<Col><a href='#'>跳转</a></Col>
-				<Col><a href='#'>上一页</a></Col>
-				<Col><a href='#'>下一页</a></Col>
+				<Col className='col-2'><a href=''  onClick={(event)=>{event.preventDefault();nowPage!=1&&setNowPage(nowPage-1)}}>上一页</a></Col>
+				<Col className='col-2'><a href=''  onClick={(event)=>{event.preventDefault();nowPage!=pageNumber&&setNowPage(nowPage+1)}}>下一页</a></Col>
+				<Col className="d-flex justify-content-end">
+					第{nowPage}页/共{pageNumber}页
+				</Col>
 			</Row>
 		</Container>
 	)
@@ -158,30 +231,72 @@ function Mailbox(){
 function SendMail(){
 	const [show,setshow]=useState(false)
 	const [receivers,setReceivers]=useState([])
+	const [users,setUsers]=useState([])
+	const navigate = useNavigate();
+
+	const popup=usePopupContext()
 
 	function finishedSelect(event,selectedItems){
 		setReceivers([...selectedItems])
 		setshow(false)
 	}
-	const users=[
-		{
-			name:'ljh',
-			id:1,
-			avatar:'http://localhost:3000/logo192.png'
-		},		{
-			name:'aiolj',
-			id:2,
-			avatar:'http://localhost:3000/logo192.png'
-		},		{
-			name:'heidwsdiwao',
-			id:3,
-			avatar:'/'
-		},		{
-			name:'jfghushfc',
-			id:14,
-			avatar:'/'
-		},
-	]
+
+	//获取可发送对象
+	async function fetchSendableObjects() {
+		try {
+		  var response = await fetch(config['API']['MAIL_API']['sendable_object'], {
+			credentials: 'include',
+			method: 'GET',
+		  });
+		  const data = await response.json();
+		  setUsers(data);
+		  
+		} catch (error) {
+		  setUsers([]);
+		  console.error(error);
+		}
+	}
+
+	useEffect(() => {
+		fetchSendableObjects();
+	}, []);
+
+
+	function submitForm(data){
+		// 添加收件人
+		data.receivers=[]
+		for(var i in receivers){
+			data.receivers.push(receivers[i].id)
+		}
+		console.log(data)
+		//发送请求
+		fetch(config['API']['MAIL_API']['send_mail'], {
+			method: 'POST',
+			credentials: 'include',
+			body: JSON.stringify(data),
+			headers:{
+				'Content-Type': 'application/json'
+			}
+		  })
+			.then(response => response.json())
+			.then(result => {
+				if (result.result=='ok'){
+					popup('发送成功！','成功','information')
+					// //清空组件的状态
+					// setReceivers([])
+					// setUsers([])
+					navigate('/')
+				}
+				else{
+					popup(result.message,'发送失败','information')
+				}
+			})
+			.catch(error => { 
+			  console.error('Error:', error);
+			  popup('发送失败！','失败','information')
+			});
+	}
+
 	return(
 		<Container>
 			<SelectItems 
@@ -201,24 +316,7 @@ function SendMail(){
 				</Col>
 			</Row>
 			<Row className='my-2'>
-				<Form>
-					<FloatingLabel
-						controlId="floatingInput"
-						label="主题"
-						className="mb-3"
-					>
-						<Form.Control type="email" placeholder=''/>
-					</FloatingLabel>
-					<Form.Group>
-						<Form.Label>正文</Form.Label>
-						<Form.Control as='textarea' rows={10}/>
-					</Form.Group>
-					<Form.Group className='my-3'>
-						<Form.Label>添加附件</Form.Label>
-						<Form.Control type='file'></Form.Control>
-					</Form.Group>
-					<Button className='my-3'>提交</Button>
-				</Form>
+				<SendMailForm isReceivers={receivers.length==0} submitFunction={submitForm}/>
 			</Row>
 		</Container>
 	)

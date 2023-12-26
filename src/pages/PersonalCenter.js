@@ -1,4 +1,4 @@
-import { Container, Row, Col,Card ,Button, Modal,Form} from 'react-bootstrap';
+import { Container, Row, Col,Card ,Button, Modal,Figure,Form} from 'react-bootstrap';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -12,6 +12,8 @@ import config from '../config';
 import {HorizontalPlaceholder,VerticalPlaceholder} from '../components/Placeholder'
 import ModifyPersonalInformationForm from '../form/ModifyPersonalInformation';
 import usePopupContext from '../context/PopupContext';
+import UploadFile from '../form/UploadFile';
+import { useState } from 'react';
 
 function PersonalCenter(){
   return (
@@ -25,7 +27,6 @@ function PersonalCenter(){
     </div>
   )
 }
-
 export default PersonalCenter;
 
 
@@ -35,7 +36,8 @@ function PersonalCenterRoute(){
   return (    
       <Routes basePath='/personal-center' >
         <Route path='/' element={<PersonalCenterUI/>}/>
-        <Route path='/modify/personal-info' element={<ModifyPersonalInformation a={'d'}/>}/>
+        <Route path='/modify/personal-info' element={<ModifyPersonalInformation />}/>
+        <Route path='/modify/avatar' element={<ModifyAvatar/>}/>
       </Routes>
   )
 }
@@ -43,6 +45,30 @@ function PersonalCenterRoute(){
 //个人中心的界面
 function PersonalCenterUI(){
   const [userManager,state] = useUserContext();
+	const navigate = useNavigate();
+  const popup=usePopupContext()
+  
+  function Logout(){
+    //发送请求
+    fetch(config['API']['AUTH_API']['logout'],{
+      method:'GET',
+      credentials:'include',
+    })
+    .then(response=>response.json())
+    .then(result=>{
+      if(result.result=='ok'){
+        userManager.clear()
+        navigate('/')
+      }else{
+        popup('登出失败','失败')
+      }
+    })
+    .catch(error=>{
+      popup('网络错误','错误')
+      console.error(error)
+    })
+  }
+
   return(
   <Card>
     <Tabs
@@ -63,8 +89,9 @@ function PersonalCenterUI(){
             </Col>
             <Col >
               <Row><VerticalPlaceholder height={3}/></Row>
-              <Row><Link href=''>上传头像</Link></Row>
+              <Row><Link to='/personal-center/modify/avatar'>修改头像</Link></Row>
               <Row><Link to='/personal-center/modify/personal-info'>修改个人信息</Link></Row>
+              <Row><a href={config['API']['AUTH_API']['logout']}>退出登录</a></Row>
             </Col>
           </Row>
           <Row><VerticalPlaceholder/></Row>
@@ -93,10 +120,126 @@ function PersonalCenterUI(){
   )
 }
 
+// 头像修改
+function ModifyAvatar(){
+  const [userManager,state] = useUserContext();
+  const oldAvatar=state.avatar
+  const [newAvatar,setNewAvatar]=useState(null)
+  const popup=usePopupContext()
+	const navigate = useNavigate();
+
+  function submitAvatar(formData){
+    fetch(config['API']['USER_API']['upload_avatar'],{
+      method:'POST',
+      body:formData,
+      credentials:'include'
+    })
+    .then(response=>response.json())
+    .then(result=>{
+      if(result.result=='ok'){
+        popup('上传成功','成功')
+        userManager.updateUserInfo()
+        navigate('/personal-center')
+      }
+      else{
+        popup(result.message,'上传失败')
+      }
+    })
+    .catch(error=>{
+      popup('网络错误','上传失败')
+      console.error(error)
+    })
+  }
+  return (
+  <Card>
+    <Card.Header>
+      <Card.Title>修改头像</Card.Title>
+    </Card.Header>
+    <Card.Body>
+      <Container>
+        <Row>
+          <Col className='col-2'></Col>
+          <Col className='col-2'>
+            <Figure>
+              <Figure.Image
+                src={newAvatar}
+                roundedCircle
+                height={500}
+                width={500}
+              />
+              <Figure.Caption className='text-center'>
+                新头像
+              </Figure.Caption>
+            </Figure>
+
+          </Col>
+          <Col className='col-2'></Col>
+          <Col className='col-2'>
+            <Figure>
+                <Figure.Image
+                  src={oldAvatar}
+                  roundedCircle
+                  height={500}
+                  width={500}
+                />
+                <Figure.Caption className='text-center'>
+                  旧头像
+                </Figure.Caption>
+            </Figure>
+          </Col>
+        </Row>
+        <Row>
+          <Col className='col-2'></Col>
+          <Col className='col-2'>
+          <UploadFile
+          describe={'上传图片'}
+          name={'avatar'}
+          types={['.jpg','.jpe','.jpeg','.png','.gif','.svg','.bmp']}
+          submitForm={submitAvatar}
+          onChangeFunction={(file)=>{
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                setNewAvatar(event.target.result);
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
+          />
+          </Col>
+        </Row>
+      </Container>
+    </Card.Body>
+  </Card>
+  )
+}
+
+
 //修改个人中心
 function ModifyPersonalInformation(){
   //上传图片的表单
-
+  function submitPhotographForm(formData){
+    fetch(config['API']['USER_API']['upload_photograph'],{
+      method:'POST',
+      body: formData,
+      credentials: 'include'
+    })
+    .then(response=>response.json())
+    .then(result=>{
+      if(result.result=='ok'){
+        popup('上传成功','成功')
+        userManager.updateUserInfo()
+        navigate('/personal-center/modify/personal-info')
+      }
+      else{
+        popup(result.message,'上传失败')
+      }
+    })
+    .catch(error=>{
+      popup('网络错误','上传失败')
+      console.error(error)
+    })
+  }
   
 
   const [userManager,state] = useUserContext();
@@ -135,14 +278,14 @@ function ModifyPersonalInformation(){
         <Row>
           <Col className='col-3'><Photograph url={state.photograph}/></Col>
           <Col className='col-5'>
-            <VerticalPlaceholder/>
-            <Form>
-              <Form.Group>
-                <Form.Label>上传照片</Form.Label>
-                <Form.Control type='file'></Form.Control>
-                <Button className='my-3'>提交</Button>
-              </Form.Group>
-            </Form>
+            {/* 上传个人照片 */}
+            <VerticalPlaceholder height={3}/>
+            <UploadFile
+            name='photograph'
+            describe={'上传个人照片：'}
+            types={['.jpg','.jpe','.jpeg','.png','.gif','.svg','.bmp']}
+            submitForm={submitPhotographForm}
+            />
           </Col>
         </Row>
         <Row className='my-3'>

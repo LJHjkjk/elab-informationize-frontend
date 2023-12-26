@@ -18,7 +18,7 @@ class UserInfo{
       this.college=null
       this.major=null
       this.classname=null
-      this.time_of_enrollment=null
+      this.grade=null
       this.join_date=null
       this.native_place=null
       this.photograph=null
@@ -71,7 +71,7 @@ class UserManager {
             college:user_result.message.college,
             major:user_result.message.major,
             classname:user_result.message.classname,
-            time_of_enrollment:user_result.message.time_of_enrollment,
+            grade:user_result.message.grade,
             join_date:user_result.message.join_date,
             native_place:user_result.message.native_place,
             photograph:user_result.message.photograph,
@@ -98,6 +98,10 @@ class UserManager {
 
   updateUserInfo(){
     this.init()
+  }
+  clear(){
+    this.callbackFunction(new UserInfo())
+    this .setUserInfo({loginMessage:'退出登录成功'})
   }
 }
 

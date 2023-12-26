@@ -7,6 +7,8 @@ import { useUserContext } from '../../context/UserContext';
 import { Col, Row } from 'react-bootstrap';
 import { Avatar } from '../Image';
 import config from '../../config';
+import { HorizontalPlaceholder,VerticalPlaceholder } from '../Placeholder';
+import { Link } from 'react-router-dom';
 
 function NavbarElab() {
   const [userManager,state]=useUserContext();
@@ -14,24 +16,31 @@ function NavbarElab() {
 
   return (
   <Navbar className="bg-secondary">
-    <Container  >
-      <Navbar.Brand href="/page" >
-        <img
-          alt=""
-          src="/img/logo.svg"
-          width="30"
-          height="30"
-          className="d-inline-block align-top"
-        />{' '}
-        ELAB
+    <Container>
+      <Navbar.Brand href="/personal-center" >
+        <Row>
+          <Col>
+          <img
+            alt=""
+            src="/favicon.png"
+            width="100"
+            height="100"
+            className="d-inline-block align-top"
+          />
+          </Col>
+          <Col style={{ display:'grid',placeItems:'center'}}>
+            ELAB
+          </Col>
+        </Row>
       </Navbar.Brand>
-      <Nav className="ml-auto">
+      <Nav className="ml-auto" style={{ display:'grid',placeItems:'center'}}>
         <RequireLogin
         logined={
-          <div className='text-center'>
-            <Avatar src={state.avatar}/>
-            <p>{state.name}</p>
-          </div>
+            <div >
+              <Link to={'/personal-center'} >
+                <Avatar src={state.avatar} size={50}/>
+              </Link>
+            </div>
         }
         notlogin={
           <a href={config['API']['AUTH_API']['login']}>登陆</a> 

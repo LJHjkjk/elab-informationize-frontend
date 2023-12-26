@@ -2,12 +2,7 @@ import { Container, Row,Figure, Col,Card,Table,FloatingLabel,Button,Badge, Modal
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import React, { useState } from 'react';
-import {Routes,Route,Link,useParams} from 'react-router-dom';
-
-import { RequireLogin } from '../components/Login';
-import { useUserContext } from '../context/UserContext';
-import { Icon } from '../components/Image';
-import config from '../config';
+import {Routes,Route,Link,useParams} from 'react-router-dom'
 
 
 import reimbursement_apply_icon from './icons/reimbursement_apply.svg'
@@ -16,11 +11,13 @@ import elab_calendar_icon from './icons/elab_calendar_icon.svg'
 import award_apply_icon from './icons/award_apply_icon.svg'
 import score_inquiry_icon from './icons/score_inquiry_icon.svg'
 import material_management_system_icon from './icons/material_management_system_icon.svg'
+import member_list_icon from './icons/member_list_icon.svg'
 
 import ResearchAssistantApply from '../components/Service/ResearchAssistantApply'
 import ReimbursementApply from '../components/Service/ResearchAssistantApply'
 import ElabCalendar from '../components/Service/ElabCalendar';
 import MaterialManagementSystem from '../components/Service/MaterialManagementSystem';
+import MemberList from '../components/Service/MemberList';
 
 function OfficeHall(){
     return(
@@ -39,6 +36,7 @@ function OfficeHallRoute(){
             <Route path='/reimbursement-apply' element={<ReimbursementApply/>}/>
             <Route path='/elab-calendar' element={<ElabCalendar/>}/>
             <Route path='/material-management-system' element={<MaterialManagementSystem/>}/>
+            <Route path='/member-list' element={<MemberList/>}/>
         </Routes>
     )
 }
@@ -80,7 +78,11 @@ function ServiceItems(){
                         <ServiceItem 
                         icon={material_management_system_icon} 
                         title='物料管理系统'
-                        url='/office-hall/material-management-system'/>
+                        url='/office-hall/material-management-system'/>                        
+                        <ServiceItem 
+                        icon={member_list_icon} 
+                        title='成员列表'
+                        url='/office-hall/member-list'/>
                     </Row>
                 </Container>
             </Card.Body>

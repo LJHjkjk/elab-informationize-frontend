@@ -1,12 +1,15 @@
 const auth_api={
   'login':'/api/auth/login',
+  'logout':'/api/auth/logout',
   'validate-login':'/api/auth/validate-login',
 }
-  
 
 const user_api={
   'get_user_info':'/api/user',
   'modify_user_info':'/api/user',
+  'upload_avatar':'/api/user/avatar',
+  'upload_photograph':'/api/user/photograph',
+  'get_members':'/api/user/members',
 }
 
 
@@ -25,6 +28,7 @@ const service_api={
     'modify_material':'/api/service/material',
     'checkin_material':'/api/service/material/checkin',
     'checkout_material':'/api/service/material/checkout',
+    'get_materail_logs':'/api/service/material/logs',
   }
 }
 

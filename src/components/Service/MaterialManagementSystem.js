@@ -4,10 +4,16 @@ import { useForm, Controller } from 'react-hook-form';
 import { DataGrid,GridToolbar,zhCN,useGridApiRef } from '@mui/x-data-grid';
 import config from '../../config';
 import usePopupContext from '../../context/PopupContext';
+import useConfrimDialog from '../../hook/useConfirmDialog';
+
+import {DataGridPro} from '@mui/x-data-grid-pro';
 
 import useModalShow from '../../hook/useModalShow';
 import MaterialInfoForm from '../../form/MaterialInfoForm';
+import { RequireLogin } from '../Login';
 
+
+//出库
 function MaterialCheckout({apiRef,setRefresh}){
     const {control,handleSubmit}=useForm()
     const popup=usePopupContext()
@@ -71,6 +77,7 @@ function MaterialCheckout({apiRef,setRefresh}){
     )
 }
 
+//入库
 function MaterialCheckin({apiRef,setRefresh}){
     const {control,handleSubmit}=useForm()
     const popup=usePopupContext()
@@ -130,7 +137,7 @@ function MaterialCheckin({apiRef,setRefresh}){
     )
 }
 
-
+//添加物料
 function AddMaterial({setRefresh}){
     const popup=usePopupContext()
     const { handleSubmit, control,reset} = useForm();
@@ -175,7 +182,7 @@ function AddMaterial({setRefresh}){
         </div>)
 }
 
-
+//修改物料信息
 function ModifyMaterial({apiRef,setRefresh}){
     const popup=usePopupContext()
     const { handleSubmit, control,reset,setValue} = useForm();
@@ -244,14 +251,90 @@ function ModifyMaterial({apiRef,setRefresh}){
 }
 
 
+//查看物料日志
+function MaterialLog(){
+    const [materialLogs,setMaterialLogs]=useState([])
+    const popup=usePopupContext()   
+    const columns = [
+        { field: 'id', headerName: 'ID'},
+        { field: 'datetime', headerName: '时间',type:'dateTime'},
+        { field: 'operation', headerName: '操作'},
+        { field: 'change', headerName: '改变'},
+        { field: 'operator_name', headerName: '操作人'},
+        { field: 'operator_id', headerName: '操作人id'},
+        { field: 'operation_object_name', headerName: '操作对象'},
+        { field: 'operation_object_id', headerName: '操作对象id'},
+        { field: 'old_number', headerName: '旧值'},
+        { field: 'new_number', headerName: '新值'},
+    ];
 
-function MaterialManagementSystem(){
+    //获取日志信息
+    function GetMaterailLogs(){
+        fetch(config['API']['SERVICE_API']['material_manage']['get_materail_logs'],{
+            method:'GET',
+            credentials: 'include',
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.result=='ok'){
+                //转变时间
+                if (result.data) 
+                    var transformedData = result.data.map(item => ({
+                        ...item,
+                        datetime: new Date(item.datetime*1000)
+                    }));
+                setMaterialLogs(transformedData)
+            }  
+            else{
+                popup(result.message,'获取日志信息失败')
+            }
+        })
+        .catch(error => { 
+            console.error('Error:', error);
+            popup('网络错误','错误')
+        })
+    }
+    const logTable=<DataGridPro
+                    columns={columns}
+                    rows={materialLogs}
+                    loading={()=>{}}
+                    localeText={zhCN.components.MuiDataGrid.defaultProps.localeText}
+                    slots={{ toolbar: GridToolbar }}
+                    />
+    const [setShow,ShowModal]=useModalShow({title:'物料日志',body:logTable,props:{size:"lg"}})
+
+    return(
+        <div>               
+            {ShowModal}             
+            <Button variant='danger' onClick={()=>{
+                if (materialLogs.length==0)
+                    GetMaterailLogs()
+                setShow(true)
+                }}>
+                日志
+            </Button>
+        </div>
+    )
+    
+}
+
+
+
+function MaterialManagementSystemUI(){
     //表格api
     const apiRef = useGridApiRef();
     //所有的物料
     const [materials,setMaterials]=useState([])
     //消息弹窗
     const popup=usePopupContext()
+    //确认弹窗
+    const [setConfirmDialogShow,ConfirmDialog]=useConfrimDialog(
+        {
+            title:'确认',
+            message:'是否确认要删除物料，删除后将无法撤销？',
+            selected:DelectMaterialFetch,
+        })
+    
     //刷新数据的标志
     const [refresh,setRefresh]=useState(0)
     //表格的列定义
@@ -290,11 +373,10 @@ function MaterialManagementSystem(){
 			popup('网络错误','错误')
 		})
     },[refresh])
-
-    function DelectMaterial(){
-        //获取删除对象
-        if(apiRef.current.getSelectedRows().size==0)
-            return popup('必须选择一个删除对象','错误')
+    //删除物料的请求
+    function DelectMaterialFetch(select){
+        if (!select)
+            return 
         const [Key, selected] = apiRef.current.getSelectedRows().entries().next().value;
         //发送请求
         fetch(config['API']['SERVICE_API']['material_manage']['delete_material'],{
@@ -319,13 +401,23 @@ function MaterialManagementSystem(){
             console.error(error)
         })
     }
+    
+    function DelectMaterial(){
+        //获取删除对象
+        if(apiRef.current.getSelectedRows().size==0)
+            return popup('必须选择一个删除对象','错误')
+        //确认是否要删除
+        setConfirmDialogShow(true)
+    }
+       
     return(
         <Card>
             <Card.Header><Card.Title className='text-center'>物料管理系统</Card.Title></Card.Header>
             <Card.Body>
                 <Container>
+                    {ConfirmDialog}
                     <Row style={{ height: 700, width: '100%' }}>
-                    <DataGrid
+                    <DataGridPro
                         apiRef={apiRef}
                         columns={columns}
                         rows={materials}
@@ -357,11 +449,24 @@ function MaterialManagementSystem(){
                         <Col className='col-2'>
                             <Button variant='danger' onClick={DelectMaterial}>删除</Button>
                         </Col>
+                        <Col className='col-2'>
+                            <MaterialLog/>
+                        </Col>
                     </Row>
                 </Container>
             </Card.Body>
         </Card>
     )
 }
+
+function MaterialManagementSystem(){
+    return(
+        <RequireLogin
+        notlogin={<p>请登陆</p>}
+        logined={<MaterialManagementSystemUI/>}
+        />
+    )
+  }
+
 
 export default MaterialManagementSystem 

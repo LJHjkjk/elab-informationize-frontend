@@ -1,9 +1,6 @@
 import { useForm ,Controller} from 'react-hook-form';
 import { Container, Row, Col,Card,Table,FloatingLabel,Button,Badge, Modal, Form} from 'react-bootstrap';
 
-
-
-
 function ModifyPersonalInformationForm({submitFunction,userInfo}){
     const { handleSubmit, control} = useForm({
         defaultValues:{
@@ -11,7 +8,7 @@ function ModifyPersonalInformationForm({submitFunction,userInfo}){
             college:userInfo.college,
             major:userInfo.major,
             classname:userInfo.classname,
-            time_of_enrollment:userInfo.time_of_enrollment,
+            grade:userInfo.grade,
             join_date:userInfo.join_date,
             native_place:userInfo.native_place,
             reason_for_application:userInfo.reason_for_application,
@@ -114,12 +111,12 @@ function ModifyPersonalInformationForm({submitFunction,userInfo}){
                     </Col>
                     <Col className='col-4'>
                     <Controller
-                        name="time_of_enrollment"
+                        name="grade"
                         control={control}
                         render={({ field }) => 
                         <Form.Group >
-                            <Form.Label>入学时间：</Form.Label>
-                            <Form.Control type='date'  {...field} />
+                            <Form.Label>年级：</Form.Label>
+                            <Form.Control type='number'  {...field} />
                         </Form.Group> }
                         />              
                     </Col>

@@ -4,7 +4,7 @@ import { useState } from 'react';
 function useModalShow({title='',header=<></>,body=<></>,footer=<></>,props}){
   const [show,setShow] =useState(false)
 
-  const ShowModaled=<ShowModal 
+  const ShowModal=<ShowModalC 
                     props={props}
                     show={show} 
                     setShow={setShow}
@@ -13,11 +13,11 @@ function useModalShow({title='',header=<></>,body=<></>,footer=<></>,props}){
                     body={body}
                     footer={footer}/>
 
-  return [setShow,ShowModaled]
+  return [setShow,ShowModal]
 }
 
 
-function ShowModal({show,setShow,title,header,body,footer,props}){
+function ShowModalC({show,setShow,title,header,body,footer,props}){
     return(
         <Modal show={show} onHide={()=>setShow(false)} {...props}>     
         <Modal.Header closeButton>
